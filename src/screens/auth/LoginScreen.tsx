@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/hooks/AuthContext';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -102,13 +103,14 @@ export function LoginScreen() {
                 keyboardType="email-address"
                 textContentType="emailAddress"
                 placeholder="you@company.com"
-                value={email}
+                defaultValue={email}
                 onChangeText={(t) => {
                   setEmail(t);
                   if (error) clearError();
                 }}
                 returnKeyType="next"
                 onSubmitEditing={() => passwordRef.current?.focus()}
+                leftIcon={<Ionicons name="mail-outline" size={18} color="#94A3B8" />}
               />
               <Input
                 ref={passwordRef}
@@ -116,26 +118,30 @@ export function LoginScreen() {
                 secureTextEntry={!showPassword}
                 textContentType="password"
                 placeholder="••••••••"
-                value={password}
+                defaultValue={password}
                 onChangeText={(t) => {
                   setPassword(t);
                   if (error) clearError();
                 }}
                 returnKeyType="go"
                 onSubmitEditing={handleSubmit}
+                leftIcon={<Ionicons name="lock-closed-outline" size={18} color="#94A3B8" />}
                 rightElement={
                   <TouchableOpacity onPress={() => setShowPassword((v) => !v)} hitSlop={10}>
-                    <Text className="text-primary-600 dark:text-primary-400 text-sm font-medium">
-                      {showPassword ? 'Hide' : 'Show'}
-                    </Text>
+                    <Ionicons
+                      name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                      size={19}
+                      color="#64748B"
+                    />
                   </TouchableOpacity>
                 }
               />
             </View>
 
             {error ? (
-              <View className="bg-danger-500/10 rounded-md px-3.5 py-3 mt-4">
-                <Text className="text-danger-600 text-sm">{error}</Text>
+              <View className="flex-row items-start gap-2 bg-danger-500/10 rounded-md px-3.5 py-3 mt-4">
+                <Ionicons name="alert-circle-outline" size={16} color="#B93838" style={{ marginTop: 1 }} />
+                <Text className="flex-1 text-danger-600 text-sm">{error}</Text>
               </View>
             ) : null}
 

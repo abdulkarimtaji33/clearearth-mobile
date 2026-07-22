@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 
 interface ErrorBoundaryState {
@@ -23,7 +24,9 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
     if (this.state.error) {
       return (
         <View className="flex-1 items-center justify-center bg-neutral-50 dark:bg-neutral-950 px-8">
-          <Text className="text-5xl mb-4">🌱</Text>
+          <View className="w-16 h-16 rounded-full bg-danger-500/10 items-center justify-center mb-4">
+            <Ionicons name="alert-circle-outline" size={32} color="#B93838" />
+          </View>
           <Text className="text-lg font-bold text-neutral-900 dark:text-neutral-50 text-center mb-2">
             Something went wrong
           </Text>

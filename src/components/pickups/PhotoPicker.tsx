@@ -1,6 +1,7 @@
 import React from 'react';
 import { Alert, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 
@@ -65,7 +66,10 @@ export function PhotoPicker({ photos, onChange, maxPhotos = 20, disabled }: Phot
   return (
     <Card>
       <View className="flex-row items-center justify-between mb-3">
-        <Text className="text-base font-bold text-neutral-900 dark:text-neutral-50">Photos</Text>
+        <View className="flex-row items-center gap-1.5">
+          <Ionicons name="images-outline" size={17} color="#0F172A" />
+          <Text className="text-base font-bold text-neutral-900 dark:text-neutral-50">Photos</Text>
+        </View>
         <Text className="text-xs text-neutral-400 dark:text-neutral-500">
           {photos.length}/{maxPhotos}
         </Text>
@@ -83,7 +87,7 @@ export function PhotoPicker({ photos, onChange, maxPhotos = 20, disabled }: Phot
                     className="absolute -top-1.5 -right-1.5 bg-danger-500 rounded-full w-5 h-5 items-center justify-center"
                     hitSlop={8}
                   >
-                    <Text className="text-white text-xs font-bold">×</Text>
+                    <Ionicons name="close" size={13} color="#fff" />
                   </Pressable>
                 ) : null}
               </View>
@@ -95,10 +99,20 @@ export function PhotoPicker({ photos, onChange, maxPhotos = 20, disabled }: Phot
       {!disabled && remaining > 0 ? (
         <View className="flex-row gap-3">
           <View className="flex-1">
-            <Button label="Take photo" variant="secondary" onPress={handleTakePhoto} />
+            <Button
+              label="Take photo"
+              variant="secondary"
+              icon={<Ionicons name="camera-outline" size={17} color="#059669" />}
+              onPress={handleTakePhoto}
+            />
           </View>
           <View className="flex-1">
-            <Button label="Choose photos" variant="secondary" onPress={handlePickFromLibrary} />
+            <Button
+              label="Choose photos"
+              variant="secondary"
+              icon={<Ionicons name="images-outline" size={17} color="#059669" />}
+              onPress={handlePickFromLibrary}
+            />
           </View>
         </View>
       ) : null}

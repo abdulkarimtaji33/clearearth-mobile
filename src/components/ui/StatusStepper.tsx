@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 
 export interface StepperStep {
   key: string;
@@ -12,7 +13,7 @@ interface StatusStepperProps {
   activeIndex: number; // 0-based index of the current (or last completed) step
 }
 
-function StepDot({ filled, active }: { filled: boolean; active: boolean }) {
+function StepDot({ filled, active, done }: { filled: boolean; active: boolean; done: boolean }) {
   const style = useAnimatedStyle(
     () => ({
       backgroundColor: withTiming(filled ? '#10B981' : '#E2E8F0', { duration: 250 }),
@@ -23,8 +24,10 @@ function StepDot({ filled, active }: { filled: boolean; active: boolean }) {
   return (
     <Animated.View
       style={style}
-      className={`w-4 h-4 rounded-full ${active ? 'border-2 border-primary-200' : ''}`}
-    />
+      className={`w-5 h-5 rounded-full items-center justify-center ${active ? 'border-2 border-primary-200' : ''}`}
+    >
+      {done ? <Ionicons name="checkmark" size={13} color="#fff" /> : null}
+    </Animated.View>
   );
 }
 
@@ -38,7 +41,7 @@ export function StatusStepper({ steps, activeIndex }: StatusStepperProps) {
           <View key={step.key} className="flex-1 items-center">
             <View className="flex-row items-center w-full">
               <View className="flex-1" />
-              <StepDot filled={filled} active={index === activeIndex} />
+              <StepDot filled={filled} active={index === activeIndex} done={index < activeIndex} />
               <View className="flex-1">
                 {!isLast && (
                   <View

@@ -58,7 +58,7 @@ export function CompletePickupForm({
             label="Quantity collected"
             keyboardType="decimal-pad"
             placeholder="0"
-            value={quantity}
+            defaultValue={quantity}
             onChangeText={setQuantity}
             editable={!submitting}
           />
@@ -131,7 +131,7 @@ export function CompletePickupForm({
           onChangeText={setRemarks}
           editable={!submitting}
           placeholder="Any notes about this pickup..."
-          placeholderTextColor="#A4AC9B"
+          placeholderTextColor="#94A3B8"
           className="text-base text-neutral-900 dark:text-neutral-50 border border-neutral-200 dark:border-neutral-700 rounded-md p-3.5 min-h-[96px]"
           textAlignVertical="top"
         />

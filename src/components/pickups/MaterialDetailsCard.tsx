@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Card } from '@/components/ui/Card';
 import type { PickupMaterial } from '@/api/types';
 
@@ -12,7 +13,10 @@ export function MaterialDetailsCard({ material }: MaterialDetailsCardProps) {
 
   return (
     <Card>
-      <Text className="text-base font-bold text-neutral-900 dark:text-neutral-50 mb-3">Material details</Text>
+      <View className="flex-row items-center gap-1.5 mb-3">
+        <Ionicons name="cube-outline" size={17} color="#0F172A" />
+        <Text className="text-base font-bold text-neutral-900 dark:text-neutral-50">Material details</Text>
+      </View>
 
       {!hasAnyDetail ? (
         <Text className="text-sm text-neutral-400 dark:text-neutral-500">Not available</Text>

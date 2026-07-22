@@ -31,7 +31,7 @@ export const Input = forwardRef<TextInput, InputProps>(
           <TextInput
             ref={ref}
             className={`flex-1 py-3.5 text-base text-neutral-900 dark:text-neutral-50 ${className}`}
-            placeholderTextColor="#A4AC9B"
+            placeholderTextColor="#94A3B8"
             onFocus={(e) => {
               setFocused(true);
               onFocus?.(e);

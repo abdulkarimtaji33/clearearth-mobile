@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { callPhoneNumber, openPickupLocation } from '@/lib/linking';
@@ -14,7 +15,10 @@ export function LocationCard({ deal }: LocationCardProps) {
 
   return (
     <Card>
-      <Text className="text-base font-bold text-neutral-900 dark:text-neutral-50 mb-3">Pickup location</Text>
+      <View className="flex-row items-center gap-1.5 mb-3">
+        <Ionicons name="location-outline" size={17} color="#0F172A" />
+        <Text className="text-base font-bold text-neutral-900 dark:text-neutral-50">Pickup location</Text>
+      </View>
 
       {deal.pickup_location ? (
         <Text className="text-sm text-neutral-600 dark:text-neutral-400 mb-3" numberOfLines={2}>
@@ -34,13 +38,18 @@ export function LocationCard({ deal }: LocationCardProps) {
             <Button
               label="Open in Maps"
               variant="secondary"
+              icon={<Ionicons name="map-outline" size={17} color="#059669" />}
               onPress={() => openPickupLocation(deal.pickup_location!)}
             />
           </View>
         ) : null}
         {deal.pickup_contact_number ? (
           <View className="flex-1">
-            <Button label="Call" onPress={() => callPhoneNumber(deal.pickup_contact_number!)} />
+            <Button
+            label="Call"
+            icon={<Ionicons name="call-outline" size={17} color="#fff" />}
+            onPress={() => callPhoneNumber(deal.pickup_contact_number!)}
+          />
           </View>
         ) : null}
       </View>

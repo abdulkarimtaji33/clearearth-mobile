@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 import { usePickupDetail } from '@/hooks/usePickups';
 import { useStartPickup } from '@/hooks/useStartPickup';
 import { useCompletePickup } from '@/hooks/useCompletePickup';
@@ -53,6 +54,7 @@ export function PickupDetailScreen() {
     return (
       <View className="flex-1 bg-neutral-50 dark:bg-neutral-950" style={{ paddingTop: insets.top }}>
         <EmptyState
+          icon={<Ionicons name="cloud-offline-outline" size={40} color="#94A3B8" />}
           title="Couldn't load this pickup"
           description="Check your connection and try again."
           action={<Button label="Retry" onPress={() => refetch()} />}
@@ -76,7 +78,7 @@ export function PickupDetailScreen() {
   async function handleComplete(payload: Parameters<typeof completeMutation.mutateAsync>[0]) {
     try {
       await completeMutation.mutateAsync(payload);
-      toast.show('Pickup confirmed 🎉', 'success');
+      toast.show('Pickup confirmed', 'success');
     } catch {
       toast.show('Could not confirm pickup — please try again.', 'error');
     } finally {
@@ -93,7 +95,7 @@ export function PickupDetailScreen() {
         style={{ paddingTop: insets.top + 12 }}
       >
         <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={12} className="mr-3">
-          <Text className="text-2xl text-neutral-700 dark:text-neutral-200">‹</Text>
+          <Ionicons name="chevron-back" size={26} color="#334155" />
         </TouchableOpacity>
         <View className="flex-1">
           <Text className="text-lg font-bold text-neutral-900 dark:text-neutral-50" numberOfLines={1}>
@@ -122,7 +124,7 @@ export function PickupDetailScreen() {
         <Animated.View entering={FadeInDown.duration(300).delay(120)}>
           <PhotoGallery
             title="Inspection Photos"
-            icon="🔍"
+            icon="search-outline"
             files={pickup.inspectionPhotos}
             emptyHint="No inspection photos were attached to this deal."
           />
@@ -163,7 +165,10 @@ export function PickupDetailScreen() {
         {isCompleted ? (
           <Animated.View entering={FadeInDown.duration(300).delay(180)}>
             <Card className="bg-completed-bg dark:bg-completed-bgDark border-0">
-              <Text className="text-completed font-bold text-base mb-1">✓ Pickup confirmed</Text>
+              <View className="flex-row items-center gap-1.5 mb-1">
+                <Ionicons name="checkmark-circle" size={18} color="#059669" />
+                <Text className="text-completed font-bold text-base">Pickup confirmed</Text>
+              </View>
               <Text className="text-completed text-sm">
                 {pickup.pickupQuantity ? `${pickup.pickupQuantity} ${pickup.pickupUom ?? ''} collected` : 'Collected'}
                 {pickup.pickupCondition ? ` · Condition: ${pickup.pickupCondition}` : ''}
@@ -175,7 +180,7 @@ export function PickupDetailScreen() {
 
         {pickup.files.length > 0 ? (
           <Animated.View entering={FadeInDown.duration(300).delay(220)}>
-            <PhotoGallery title="Pickup Photos" icon="📷" files={pickup.files} />
+            <PhotoGallery title="Pickup Photos" icon="camera-outline" files={pickup.files} />
           </Animated.View>
         ) : null}
       </ScrollView>

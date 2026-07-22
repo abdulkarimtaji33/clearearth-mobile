@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import type { PickupDetail } from '@/api/types';
@@ -25,7 +26,10 @@ export function AssignmentCard({ pickup }: AssignmentCardProps) {
   return (
     <Card>
       <View className="flex-row items-center justify-between mb-3">
-        <Text className="text-base font-bold text-neutral-900 dark:text-neutral-50">Assignment</Text>
+        <View className="flex-row items-center gap-1.5">
+          <Ionicons name="clipboard-outline" size={17} color="#0F172A" />
+          <Text className="text-base font-bold text-neutral-900 dark:text-neutral-50">Assignment</Text>
+        </View>
         <Badge label={pickup.workOrderStatus ?? '—'} />
       </View>
       <Row label="Work order" value={`#${pickup.workOrderId}`} />

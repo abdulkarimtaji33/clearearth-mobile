@@ -2,8 +2,15 @@ import React, { createContext, useCallback, useContext, useRef, useState } from 
 import { Text } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 
 type ToastTone = 'success' | 'error' | 'info';
+
+const TONE_ICONS: Record<ToastTone, keyof typeof Ionicons.glyphMap> = {
+  success: 'checkmark-circle',
+  error: 'alert-circle',
+  info: 'information-circle',
+};
 
 interface ToastState {
   id: number;
@@ -52,9 +59,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {toast ? (
         <Animated.View
           style={[animatedStyle, { top: insets.top + 8 }]}
-          className={`absolute left-4 right-4 rounded-lg px-4 py-3.5 ${TONE_CLASSES[toast.tone]}`}
+          className={`absolute left-4 right-4 flex-row items-center gap-2 rounded-lg px-4 py-3.5 ${TONE_CLASSES[toast.tone]}`}
         >
-          <Text className="text-white text-sm font-medium">{toast.message}</Text>
+          <Ionicons name={TONE_ICONS[toast.tone]} size={18} color="#fff" />
+          <Text className="flex-1 text-white text-sm font-medium">{toast.message}</Text>
         </Animated.View>
       ) : null}
     </ToastContext.Provider>

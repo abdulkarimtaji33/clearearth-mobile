@@ -1,15 +1,17 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/hooks/AuthContext';
 import { usePickups } from '@/hooks/usePickups';
 import { Avatar } from '@/components/ui/Avatar';
 import { PickupCardSkeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/Button';
+import { SearchBar } from '@/components/ui/SearchBar';
 import { SummaryTiles } from '@/components/pickups/SummaryTiles';
 import { FilterTabs } from '@/components/pickups/FilterTabs';
 import { PickupCard } from '@/components/pickups/PickupCard';
@@ -19,10 +21,11 @@ import type { AppStackParamList } from '@/navigation/types';
 
 export function PickupListScreen() {
   const insets = useSafeAreaInsets();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const { data, isLoading, isError, refetch, isRefetching } = usePickups();
   const [filter, setFilter] = useState<PickupPriority | 'all'>('all');
+  const [search, setSearch] = useState('');
 
   useFocusEffect(
     React.useCallback(() => {
@@ -40,12 +43,44 @@ export function PickupListScreen() {
 
   const filtered = useMemo(() => {
     if (!data) return [];
-    if (filter === 'all') return data;
-    return data.filter((p) => p.priority === filter);
-  }, [data, filter]);
+    let result = filter === 'all' ? data : data.filter((p) => p.priority === filter);
+
+    const query = search.trim().toLowerCase();
+    if (query) {
+      result = result.filter((p) => {
+        const haystack = [
+          p.deal?.title,
+          p.workOrderTitle,
+          p.deal?.deal_number,
+          p.typeOfWork,
+          p.deal?.pickup_contact_name,
+          p.deal?.pickup_location,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+        return haystack.includes(query);
+      });
+    }
+    return result;
+  }, [data, filter, search]);
 
   const greeting = greetingForNow();
   const firstName = user?.firstName ?? 'Driver';
+
+  const handleCardPress = useCallback(
+    (taskId: number) => navigation.navigate('PickupDetail', { taskId }),
+    [navigation]
+  );
+
+  const renderItem = useCallback(
+    ({ item, index }: { item: (typeof filtered)[number]; index: number }) => (
+      <Animated.View entering={FadeInDown.duration(350).delay(Math.min(index, 8) * 40)}>
+        <PickupCard pickup={item} onPress={handleCardPress} />
+      </Animated.View>
+    ),
+    [handleCardPress]
+  );
 
   return (
     <View className="flex-1 bg-neutral-50 dark:bg-neutral-950" style={{ paddingTop: insets.top }}>
@@ -54,7 +89,7 @@ export function PickupListScreen() {
           <Text className="text-sm text-neutral-500 dark:text-neutral-400">{greeting},</Text>
           <Text className="text-2xl font-extrabold text-neutral-900 dark:text-neutral-50">{firstName} 👋</Text>
         </View>
-        <TouchableOpacity onPress={signOut} hitSlop={10}>
+        <TouchableOpacity onPress={() => navigation.navigate('Profile')} hitSlop={10}>
           <Avatar name={`${user?.firstName ?? ''} ${user?.lastName ?? ''}`} />
         </TouchableOpacity>
       </View>
@@ -67,6 +102,7 @@ export function PickupListScreen() {
         </View>
       ) : isError ? (
         <EmptyState
+          icon={<Ionicons name="cloud-offline-outline" size={40} color="#94A3B8" />}
           title="Couldn't load your pickups"
           description="Check your connection and try again."
           action={<Button label="Retry" onPress={() => refetch()} />}
@@ -77,27 +113,46 @@ export function PickupListScreen() {
           keyExtractor={(item) => String(item.taskId)}
           ListHeaderComponent={
             <View className="mb-5">
+              <View className="px-5 mb-4">
+                <SearchBar value={search} onChangeText={setSearch} />
+              </View>
               <SummaryTiles counts={counts} active={filter} onSelect={setFilter} />
               <View className="h-4" />
               <FilterTabs active={filter} onSelect={setFilter} total={data?.length ?? 0} />
             </View>
           }
-          renderItem={({ item, index }) => (
-            <Animated.View entering={FadeInDown.duration(350).delay(Math.min(index, 8) * 40)}>
-              <PickupCard pickup={item} onPress={() => navigation.navigate('PickupDetail', { taskId: item.taskId })} />
-            </Animated.View>
-          )}
+          renderItem={renderItem}
           contentContainerStyle={{ paddingBottom: insets.bottom + 24, flexGrow: 1 }}
           refreshControl={
             <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#10B981" />
           }
+          // A driver's list is small (tens of items, not thousands), so this is mostly
+          // about keeping scroll buttery on low-end devices rather than raw windowing need.
+          removeClippedSubviews
+          initialNumToRender={10}
+          windowSize={7}
           ListEmptyComponent={
             <EmptyState
-              title={filter === 'all' ? 'No pickups assigned' : `No ${filter} pickups`}
+              icon={
+                <Ionicons
+                  name={search.trim() ? 'search-outline' : 'checkmark-done-outline'}
+                  size={40}
+                  color="#94A3B8"
+                />
+              }
+              title={
+                search.trim()
+                  ? 'No matching pickups'
+                  : filter === 'all'
+                    ? 'No pickups assigned'
+                    : `No ${filter} pickups`
+              }
               description={
-                filter === 'all'
-                  ? "You're all caught up — new pickups will show up here."
-                  : 'Try a different filter to see other pickups.'
+                search.trim()
+                  ? `Nothing matches "${search.trim()}". Try a different search.`
+                  : filter === 'all'
+                    ? "You're all caught up — new pickups will show up here."
+                    : 'Try a different filter to see other pickups.'
               }
             />
           }

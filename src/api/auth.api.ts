@@ -14,3 +14,7 @@ export async function getCurrentUser(): Promise<CurrentUserResponse> {
 export async function logout(): Promise<void> {
   await apiClient.post('/auth/logout');
 }
+
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  await apiClient.put('/auth/change-password', { currentPassword, newPassword });
+}

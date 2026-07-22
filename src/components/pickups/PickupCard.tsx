@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 import type { PickupListItem } from '@/api/types';
 import { Badge } from '@/components/ui/Badge';
 import { PRIORITY_CONFIG } from '@/constants/statusConfig';
@@ -8,7 +9,8 @@ import { formatShortDate } from '@/lib/format';
 
 interface PickupCardProps {
   pickup: PickupListItem;
-  onPress: () => void;
+  /** Stable callback (e.g. from useCallback) — receives the pressed pickup's taskId. */
+  onPress: (taskId: number) => void;
 }
 
 const ACCENT_CLASSES: Record<PickupListItem['priority'], string> = {
@@ -18,7 +20,7 @@ const ACCENT_CLASSES: Record<PickupListItem['priority'], string> = {
   completed: 'bg-completed',
 };
 
-export function PickupCard({ pickup, onPress }: PickupCardProps) {
+function PickupCardImpl({ pickup, onPress }: PickupCardProps) {
   const scale = useSharedValue(1);
   const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
@@ -31,7 +33,7 @@ export function PickupCard({ pickup, onPress }: PickupCardProps) {
       <Pressable
         onPressIn={() => (scale.value = withTiming(0.98, { duration: 90 }))}
         onPressOut={() => (scale.value = withTiming(1, { duration: 120 }))}
-        onPress={onPress}
+        onPress={() => onPress(pickup.taskId)}
         className="flex-row bg-white dark:bg-neutral-900 rounded-lg border border-neutral-100 dark:border-neutral-800 overflow-hidden"
         style={{
           shadowColor: '#0A1628',
@@ -58,9 +60,12 @@ export function PickupCard({ pickup, onPress }: PickupCardProps) {
           </Text>
 
           {pickup.deal?.pickup_location ? (
-            <Text className="text-xs text-neutral-500 dark:text-neutral-400 mt-1.5" numberOfLines={2}>
-              📍 {pickup.deal.pickup_location}
-            </Text>
+            <View className="flex-row items-start mt-1.5 gap-1">
+              <Ionicons name="location-outline" size={13} color="#64748B" style={{ marginTop: 1 }} />
+              <Text className="flex-1 text-xs text-neutral-500 dark:text-neutral-400" numberOfLines={2}>
+                {pickup.deal.pickup_location}
+              </Text>
+            </View>
           ) : null}
 
           <View className="flex-row items-center justify-between mt-3">
@@ -85,3 +90,7 @@ export function PickupCard({ pickup, onPress }: PickupCardProps) {
     </Animated.View>
   );
 }
+
+// Memoized: pickup list items only need to re-render when their own data or the
+// (stable, useCallback'd) onPress reference changes — not on every parent re-render.
+export const PickupCard = React.memo(PickupCardImpl);

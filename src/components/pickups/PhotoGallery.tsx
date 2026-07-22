@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import ImageViewing from 'react-native-image-viewing';
+import { Ionicons } from '@expo/vector-icons';
 import { Card } from '@/components/ui/Card';
 import { resolveUploadUrl } from '@/lib/linking';
 import type { PickupTaskFile } from '@/api/types';
@@ -10,12 +11,12 @@ interface PhotoGalleryProps {
   title: string;
   files: PickupTaskFile[];
   emptyHint?: string;
-  icon?: string;
+  icon?: keyof typeof Ionicons.glyphMap;
 }
 
 const PEEK_COUNT = 8; // show up to 8 tiles + a "+N more" tile before opening the full viewer
 
-export function PhotoGallery({ title, files, emptyHint, icon = '📷' }: PhotoGalleryProps) {
+export function PhotoGallery({ title, files, emptyHint, icon = 'camera-outline' }: PhotoGalleryProps) {
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
   if (files.length === 0) {
@@ -35,9 +36,10 @@ export function PhotoGallery({ title, files, emptyHint, icon = '📷' }: PhotoGa
   return (
     <Card>
       <View className="flex-row items-center justify-between mb-3">
-        <Text className="text-base font-bold text-neutral-900 dark:text-neutral-50">
-          {icon} {title}
-        </Text>
+        <View className="flex-row items-center gap-1.5">
+          <Ionicons name={icon} size={18} color="#059669" />
+          <Text className="text-base font-bold text-neutral-900 dark:text-neutral-50">{title}</Text>
+        </View>
         <View className="bg-primary-50 dark:bg-primary-900/40 rounded-full px-2.5 py-0.5">
           <Text className="text-xs font-bold text-primary-700 dark:text-primary-300">{files.length}</Text>
         </View>
