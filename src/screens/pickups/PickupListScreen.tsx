@@ -89,7 +89,7 @@ export function PickupListScreen() {
           )}
           contentContainerStyle={{ paddingBottom: insets.bottom + 24, flexGrow: 1 }}
           refreshControl={
-            <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#2F9E63" />
+            <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#10B981" />
           }
           ListEmptyComponent={
             <EmptyState

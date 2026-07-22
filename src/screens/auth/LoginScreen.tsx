@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -10,10 +11,14 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '@/hooks/AuthContext';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { ApiUrlSheet } from '@/components/ui/ApiUrlSheet';
+import { BRAND } from '@/theme/tokens';
+
+const LOGO = require('../../../assets/images/clearearth-logo.png');
 
 export function LoginScreen() {
   const insets = useSafeAreaInsets();
@@ -40,35 +45,54 @@ export function LoginScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      className="flex-1 bg-primary-900"
+    <LinearGradient
+      colors={[BRAND.dark, '#0d2137', '#0a2e1f']}
+      locations={[0, 0.6, 1]}
+      start={{ x: 0.15, y: 0 }}
+      end={{ x: 0.9, y: 1 }}
+      className="flex-1"
     >
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1, paddingTop: insets.top }}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View className="flex-1 px-6">
-          <Animated.View entering={FadeInDown.duration(500)} className="items-center mt-16 mb-10">
-            <View className="w-20 h-20 rounded-2xl bg-primary-500 items-center justify-center mb-5">
-              <Text className="text-3xl">🌿</Text>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1">
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, paddingTop: insets.top }}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* ── Hero ── */}
+          <Animated.View entering={FadeInDown.duration(500)} className="items-center pt-10 pb-8 px-6">
+            <View
+              className="w-24 h-24 rounded-2xl bg-white items-center justify-center mb-5 p-3"
+              style={{
+                shadowColor: BRAND.green,
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.35,
+                shadowRadius: 20,
+                elevation: 10,
+              }}
+            >
+              <Image source={LOGO} resizeMode="contain" style={{ width: '100%', height: '100%' }} />
             </View>
-            <Text className="text-2xl font-bold text-white">ClearEarth Driver</Text>
-            <Text className="text-primary-200 mt-1.5">Pickups made simple</Text>
+            <Text className="text-2xl font-extrabold text-white text-center">Clear Earth Driver</Text>
+            <Text className="text-emerald-200/80 mt-1.5 text-center" style={{ color: '#A7F3D0' }}>
+              Smarter waste. Greener future.
+            </Text>
           </Animated.View>
 
+          {/* ── Form sheet ── */}
           <Animated.View
             entering={FadeInUp.duration(500).delay(100)}
-            className="bg-white dark:bg-neutral-900 rounded-xl p-6"
+            className="flex-1 bg-white dark:bg-neutral-950 rounded-t-3xl px-6 pt-8"
             style={{
-              shadowColor: '#0F3A27',
-              shadowOffset: { width: 0, height: 10 },
-              shadowOpacity: 0.2,
-              shadowRadius: 24,
-              elevation: 10,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: -4 },
+              shadowOpacity: 0.15,
+              shadowRadius: 20,
+              elevation: 12,
             }}
           >
-            <Text className="text-lg font-bold text-neutral-900 dark:text-neutral-50 mb-5">Sign in</Text>
+            <Text className="text-xl font-bold text-neutral-900 dark:text-neutral-50">Welcome back</Text>
+            <Text className="text-sm text-neutral-500 dark:text-neutral-400 mt-1 mb-6">
+              Sign in to your Clear Earth account
+            </Text>
 
             <View className="gap-4">
               <Input
@@ -101,7 +125,7 @@ export function LoginScreen() {
                 onSubmitEditing={handleSubmit}
                 rightElement={
                   <TouchableOpacity onPress={() => setShowPassword((v) => !v)} hitSlop={10}>
-                    <Text className="text-primary-600 text-sm font-medium">
+                    <Text className="text-primary-600 dark:text-primary-400 text-sm font-medium">
                       {showPassword ? 'Hide' : 'Show'}
                     </Text>
                   </TouchableOpacity>
@@ -116,25 +140,31 @@ export function LoginScreen() {
             ) : null}
 
             <View className="mt-6">
-              <Button label="Sign in" onPress={handleSubmit} loading={submitting} disabled={!canSubmit} fullWidth />
+              <Button label="Sign in" onPress={handleSubmit} loading={submitting} disabled={!canSubmit} fullWidth size="lg" />
             </View>
-          </Animated.View>
 
-          {__DEV__ ? (
-            <TouchableOpacity
-              onPress={() => setSettingsOpen(true)}
-              className="items-center mt-6 mb-8"
-              hitSlop={12}
-            >
-              <Text className="text-primary-300 text-xs">Connection settings</Text>
-            </TouchableOpacity>
-          ) : (
-            <View className="mb-8" />
-          )}
-        </View>
-      </ScrollView>
+            <View className="flex-row items-center gap-3 my-6">
+              <View className="flex-1 h-px bg-neutral-200 dark:bg-neutral-800" />
+              <Text className="text-xs text-neutral-400 dark:text-neutral-500 font-medium">CLEAR EARTH ERP</Text>
+              <View className="flex-1 h-px bg-neutral-200 dark:bg-neutral-800" />
+            </View>
+
+            <Text className="text-xs text-neutral-400 dark:text-neutral-500 text-center mb-4">
+              Don&apos;t have an account? Contact your system administrator.
+            </Text>
+
+            {__DEV__ ? (
+              <TouchableOpacity onPress={() => setSettingsOpen(true)} className="items-center mb-8" hitSlop={12}>
+                <Text className="text-neutral-300 dark:text-neutral-600 text-xs">Connection settings</Text>
+              </TouchableOpacity>
+            ) : (
+              <View className="mb-8" />
+            )}
+          </Animated.View>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       {__DEV__ ? <ApiUrlSheet visible={settingsOpen} onClose={() => setSettingsOpen(false)} /> : null}
-    </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }

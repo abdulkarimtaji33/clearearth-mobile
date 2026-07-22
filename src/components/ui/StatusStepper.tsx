@@ -15,7 +15,7 @@ interface StatusStepperProps {
 function StepDot({ filled, active }: { filled: boolean; active: boolean }) {
   const style = useAnimatedStyle(
     () => ({
-      backgroundColor: withTiming(filled ? '#2F9E63' : '#E3E7DF', { duration: 250 }),
+      backgroundColor: withTiming(filled ? '#10B981' : '#E2E8F0', { duration: 250 }),
       transform: [{ scale: withTiming(active ? 1.15 : 1, { duration: 250 }) }],
     }),
     [filled, active]

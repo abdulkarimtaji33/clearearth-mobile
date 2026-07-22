@@ -17,7 +17,7 @@ import { AssignmentCard } from '@/components/pickups/AssignmentCard';
 import { MaterialDetailsCard } from '@/components/pickups/MaterialDetailsCard';
 import { LocationCard } from '@/components/pickups/LocationCard';
 import { CompletePickupForm } from '@/components/pickups/CompletePickupForm';
-import { ExistingPhotoGallery } from '@/components/pickups/ExistingPhotoGallery';
+import { PhotoGallery } from '@/components/pickups/PhotoGallery';
 import { PRIORITY_CONFIG } from '@/constants/statusConfig';
 import type { AppStackParamList } from '@/navigation/types';
 
@@ -44,7 +44,7 @@ export function PickupDetailScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-neutral-50 dark:bg-neutral-950">
-        <ActivityIndicator size="large" color="#2F9E63" />
+        <ActivityIndicator size="large" color="#10B981" />
       </View>
     );
   }
@@ -115,11 +115,18 @@ export function PickupDetailScreen() {
           <AssignmentCard pickup={pickup} />
         </Animated.View>
 
-        {pickup.material ? (
-          <Animated.View entering={FadeInDown.duration(300).delay(100)}>
-            <MaterialDetailsCard material={pickup.material} />
-          </Animated.View>
-        ) : null}
+        <Animated.View entering={FadeInDown.duration(300).delay(100)}>
+          <MaterialDetailsCard material={pickup.material} />
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.duration(300).delay(120)}>
+          <PhotoGallery
+            title="Inspection Photos"
+            icon="🔍"
+            files={pickup.inspectionPhotos}
+            emptyHint="No inspection photos were attached to this deal."
+          />
+        </Animated.View>
 
         {pickup.deal ? (
           <Animated.View entering={FadeInDown.duration(300).delay(140)}>
@@ -168,7 +175,7 @@ export function PickupDetailScreen() {
 
         {pickup.files.length > 0 ? (
           <Animated.View entering={FadeInDown.duration(300).delay(220)}>
-            <ExistingPhotoGallery files={pickup.files} />
+            <PhotoGallery title="Pickup Photos" icon="📷" files={pickup.files} />
           </Animated.View>
         ) : null}
       </ScrollView>

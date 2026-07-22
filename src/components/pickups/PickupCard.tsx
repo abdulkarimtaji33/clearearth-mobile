@@ -34,7 +34,7 @@ export function PickupCard({ pickup, onPress }: PickupCardProps) {
         onPress={onPress}
         className="flex-row bg-white dark:bg-neutral-900 rounded-lg border border-neutral-100 dark:border-neutral-800 overflow-hidden"
         style={{
-          shadowColor: '#0F3A27',
+          shadowColor: '#0A1628',
           shadowOffset: { width: 0, height: 3 },
           shadowOpacity: 0.05,
           shadowRadius: 8,

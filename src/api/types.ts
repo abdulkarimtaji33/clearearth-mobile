@@ -96,6 +96,7 @@ export interface PickupDetail extends Omit<PickupListItem, 'deal'> {
   files: PickupTaskFile[];
   deal: PickupDealWithCompany | null;
   material: PickupMaterial | null;
+  inspectionPhotos: PickupTaskFile[];
 }
 
 export interface StartPickupResponse {

@@ -1,5 +1,7 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BRAND } from '@/theme/tokens';
 
 interface AvatarProps {
   name: string;
@@ -15,13 +17,21 @@ function getInitials(name: string): string {
 
 export function Avatar({ name, size = 44 }: AvatarProps) {
   return (
-    <View
-      className="bg-primary-100 dark:bg-primary-900/50 items-center justify-center rounded-full"
-      style={{ width: size, height: size }}
+    <LinearGradient
+      colors={[BRAND.green, BRAND.teal]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
     >
-      <Text className="text-primary-700 dark:text-primary-300 font-bold" style={{ fontSize: size * 0.36 }}>
+      <Text className="text-white font-bold" style={{ fontSize: size * 0.36 }}>
         {getInitials(name)}
       </Text>
-    </View>
+    </LinearGradient>
   );
 }

@@ -15,7 +15,7 @@ export function Card({ padded = true, elevated = true, className = '', children,
       style={
         elevated
           ? {
-              shadowColor: '#0F3A27',
+              shadowColor: '#0A1628',
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.06,
               shadowRadius: 10,
