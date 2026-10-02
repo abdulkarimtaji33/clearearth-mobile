@@ -24,7 +24,7 @@ export function ProfileScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
 
-  const fullName = `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || 'Driver';
+  const fullName = `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || 'User';
 
   function resetPasswordForm() {
     setCurrentPassword('');
@@ -56,7 +56,7 @@ export function ProfileScreen() {
   }
 
   function handleSignOutPress() {
-    Alert.alert('Sign out?', "You'll need to sign in again to see your pickups.", [
+    Alert.alert('Sign out?', "You'll need to sign in again to continue.", [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Sign out', style: 'destructive', onPress: () => signOut() },
     ]);
@@ -74,7 +74,7 @@ export function ProfileScreen() {
         <Text className="text-lg font-bold text-neutral-900 dark:text-neutral-50">Profile</Text>
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 32, gap: 16 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 32, gap: 16 }}>
         <Card>
           <View className="items-center py-2">
             <Avatar name={fullName} size={72} />
@@ -166,7 +166,7 @@ export function ProfileScreen() {
         </TouchableOpacity>
 
         <Text className="text-xs text-neutral-400 dark:text-neutral-600 text-center mt-2">
-          ClearEarth Driver v{Constants.expoConfig?.version ?? '1.0.0'}
+          ClearEarth v{Constants.expoConfig?.version ?? '1.0.0'}
         </Text>
       </ScrollView>
     </View>

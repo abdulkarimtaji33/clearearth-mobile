@@ -55,6 +55,7 @@ export function LoginScreen() {
     >
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1">
         <ScrollView
+          style={{ flex: 1 }}
           contentContainerStyle={{ flexGrow: 1, paddingTop: insets.top }}
           keyboardShouldPersistTaps="handled"
         >
@@ -72,7 +73,7 @@ export function LoginScreen() {
             >
               <Image source={LOGO} resizeMode="contain" style={{ width: '100%', height: '100%' }} />
             </View>
-            <Text className="text-2xl font-extrabold text-white text-center">Clear Earth Driver</Text>
+            <Text className="text-2xl font-extrabold text-white text-center">Clear Earth</Text>
             <Text className="text-emerald-200/80 mt-1.5 text-center" style={{ color: '#A7F3D0' }}>
               Smarter waste. Greener future.
             </Text>

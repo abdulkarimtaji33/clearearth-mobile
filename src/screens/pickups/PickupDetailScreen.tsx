@@ -106,7 +106,7 @@ export function PickupDetailScreen() {
         <Badge label={PRIORITY_CONFIG[pickup.priority].label} tone={pickup.priority} />
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 32, gap: 16 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 32, gap: 16 }}>
         <Animated.View entering={FadeInDown.duration(300)}>
           <Card>
             <StatusStepper steps={STEPS} activeIndex={STEP_INDEX[pickup.taskStatus] ?? 0} />
