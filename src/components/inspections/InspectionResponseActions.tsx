@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { Alert, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -10,9 +10,10 @@ interface InspectionResponseActionsProps {
   requestId: number;
 }
 
-/** Shown while response_status === 'pending'. Accept is one tap; reject opens an
- * inline reason field (required by the backend) instead of a native-only
- * Alert.prompt, so it behaves the same on iOS and Android. */
+/** Shown while response_status === 'pending'. Reject opens an inline reason
+ * field (required by the backend) instead of a native-only Alert.prompt, so
+ * it behaves the same on iOS and Android. Both accept and reject require a
+ * final native confirmation before the mutation actually fires. */
 export function InspectionResponseActions({ requestId }: InspectionResponseActionsProps) {
   const toast = useToast();
   const acceptMutation = useAcceptInspection(requestId);
@@ -20,7 +21,7 @@ export function InspectionResponseActions({ requestId }: InspectionResponseActio
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState('');
 
-  async function handleAccept() {
+  async function acceptNow() {
     try {
       await acceptMutation.mutateAsync();
       toast.show('Request accepted', 'success');
@@ -29,8 +30,14 @@ export function InspectionResponseActions({ requestId }: InspectionResponseActio
     }
   }
 
-  async function handleReject() {
-    if (!reason.trim()) return;
+  function handleAccept() {
+    Alert.alert('Accept this request?', "You'll be responsible for carrying out this inspection.", [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Accept', onPress: acceptNow },
+    ]);
+  }
+
+  async function rejectNow() {
     try {
       await rejectMutation.mutateAsync(reason.trim());
       toast.show('Request rejected', 'success');
@@ -39,6 +46,14 @@ export function InspectionResponseActions({ requestId }: InspectionResponseActio
     } catch {
       toast.show('Could not reject — please try again.', 'error');
     }
+  }
+
+  function handleReject() {
+    if (!reason.trim()) return;
+    Alert.alert('Reject this request?', 'This cannot be undone. The requester will be notified with your reason.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Reject', style: 'destructive', onPress: rejectNow },
+    ]);
   }
 
   const busy = acceptMutation.isPending || rejectMutation.isPending;
