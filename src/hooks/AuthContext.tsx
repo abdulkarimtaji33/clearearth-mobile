@@ -3,7 +3,11 @@ import { getCurrentUser, login as loginRequest, logout as logoutRequest } from '
 import { setUnauthorizedHandler } from '@/api/client';
 import { initApiBaseUrl } from '@/lib/env';
 import { tokenStorage } from '@/lib/secureStore';
+import { isSupportedRole } from '@/lib/roles';
 import type { AuthTenant, AuthUser } from '@/api/types';
+
+const UNSUPPORTED_ROLE_MESSAGE =
+  'This app supports driver and inspection accounts only. Please sign in with one of those.';
 
 interface AuthState {
   status: 'loading' | 'signedIn' | 'signedOut';
@@ -47,28 +51,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     (async () => {
-      await initApiBaseUrl();
-      const accessToken = await tokenStorage.getAccessToken();
-      if (!accessToken) {
-        setState({ status: 'signedOut', user: null, tenant: null, error: null });
-        return;
-      }
+      // Everything here — including the SecureStore/Keystore reads themselves —
+      // must never leave `status` stuck on 'loading': a device-level SecureStore
+      // failure (seen on some Android versions/OEMs, e.g. after a key-invalidating
+      // OS update) would otherwise hang the app on the splash/loading screen
+      // forever with nothing visibly wrong. Any failure anywhere in this flow
+      // falls back to a clean signed-out state instead.
       try {
-        const user = await getCurrentUser();
-        if (user.role !== 'driver') {
-          // Non-driver accounts aren't supported by this app's UX — sign them back out.
-          await tokenStorage.clear();
-          setState({
-            status: 'signedOut',
-            user: null,
-            tenant: null,
-            error: 'This app is for drivers only. Please sign in with a driver account.',
-          });
+        await initApiBaseUrl();
+        const accessToken = await tokenStorage.getAccessToken();
+        if (!accessToken) {
+          setState({ status: 'signedOut', user: null, tenant: null, error: null });
           return;
         }
-        setState({ status: 'signedIn', user, tenant: user.tenant ?? null, error: null });
-      } catch {
-        await tokenStorage.clear();
+        try {
+          const user = await getCurrentUser();
+          if (!isSupportedRole(user.role)) {
+            // Unsupported accounts aren't supported by this app's UX — sign them back out.
+            await tokenStorage.clear();
+            setState({
+              status: 'signedOut',
+              user: null,
+              tenant: null,
+              error: UNSUPPORTED_ROLE_MESSAGE,
+            });
+            return;
+          }
+          setState({ status: 'signedIn', user, tenant: user.tenant ?? null, error: null });
+        } catch {
+          await tokenStorage.clear();
+          setState({ status: 'signedOut', user: null, tenant: null, error: null });
+        }
+      } catch (err) {
+        console.error('[AuthProvider] startup failed', err);
         setState({ status: 'signedOut', user: null, tenant: null, error: null });
       }
     })();
@@ -78,12 +93,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setState((s) => ({ ...s, error: null }));
     try {
       const res = await loginRequest(email, password);
-      if (res.user.role !== 'driver') {
+      if (!isSupportedRole(res.user.role)) {
         setState({
           status: 'signedOut',
           user: null,
           tenant: null,
-          error: 'This app is for drivers only. Please sign in with a driver account.',
+          error: UNSUPPORTED_ROLE_MESSAGE,
         });
         return;
       }
