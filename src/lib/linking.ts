@@ -22,6 +22,12 @@ export async function callPhoneNumber(phoneNumber: string): Promise<void> {
 
 export function resolveUploadUrl(imageUrl: string): string {
   if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
-  const path = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+  let path = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+  // Driver endpoints (driver.service.js) already prefix paths with /uploads/
+  // server-side; inspection endpoints return the raw relative upload path
+  // (same convention the web app's getUploadUrl() handles). Normalize both.
+  if (!path.startsWith('/uploads/')) {
+    path = `/uploads${path}`;
+  }
   return `${getApiOrigin()}${path}`;
 }

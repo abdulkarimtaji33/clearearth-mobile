@@ -61,6 +61,10 @@ export function useUpdateInspectionStatus(id: number) {
 
 interface SubmitInspectionReportInput extends Omit<SaveInspectionReportPayload, 'images'> {
   photos: PickedPhoto[];
+  /** Paths already on the report (editing an existing one). The backend upsert
+   * replaces `images` wholesale rather than appending, so these must be
+   * resent alongside any newly-uploaded paths or they'd be silently dropped. */
+  existingImages?: string[];
 }
 
 /** Uploads any new photos sequentially (so a single progress number stays meaningful),
@@ -73,7 +77,7 @@ export function useSaveInspectionReport(
   const invalidate = useInvalidateInspections(requestId);
   return useMutation({
     mutationFn: async (input: SubmitInspectionReportInput) => {
-      const images: string[] = [];
+      const images: string[] = [...(input.existingImages ?? [])];
       for (let i = 0; i < input.photos.length; i++) {
         const photo = input.photos[i];
         const uploaded = await uploadInspectionImage(photo, (percent) => {
@@ -82,7 +86,8 @@ export function useSaveInspectionReport(
         });
         images.push(uploaded.path);
       }
-      const { photos, ...rest } = input;
+      onUploadProgress?.(null); // uploads done — switch the UI back to a generic "saving" state
+      const { photos, existingImages, ...rest } = input;
       return saveInspectionReport(dealId, { ...rest, images });
     },
     onSuccess: invalidate,

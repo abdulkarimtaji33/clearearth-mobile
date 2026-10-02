@@ -109,6 +109,7 @@ export function InspectionReportScreen() {
         approximateValue: value.trim() || undefined,
         notes: notes.trim() || undefined,
         photos,
+        existingImages: existingReport?.images,
       });
       toast.show('Inspection report submitted', 'success');
       navigation.goBack();
