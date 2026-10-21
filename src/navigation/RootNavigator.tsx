@@ -2,10 +2,12 @@ import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { useAuth } from '@/hooks/AuthContext';
-import { isInspectionRole } from '@/lib/roles';
+import { isInspectionRole, isOperationsRole } from '@/lib/roles';
 import { AuthStack } from './AuthStack';
 import { AppStack } from './AppStack';
 import { InspectionStack } from './InspectionStack';
+import { OperationsNavigator } from './OperationsNavigator';
+import { navigationRef } from './navigationRef';
 
 export function RootNavigator() {
   const { status, user } = useAuth();
@@ -22,6 +24,14 @@ export function RootNavigator() {
     return (
       <NavigationContainer>
         <AuthStack />
+      </NavigationContainer>
+    );
+  }
+
+  if (isOperationsRole(user?.role)) {
+    return (
+      <NavigationContainer ref={navigationRef}>
+        <OperationsNavigator />
       </NavigationContainer>
     );
   }

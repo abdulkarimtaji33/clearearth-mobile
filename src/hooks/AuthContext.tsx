@@ -7,7 +7,7 @@ import { isSupportedRole } from '@/lib/roles';
 import type { AuthTenant, AuthUser } from '@/api/types';
 
 const UNSUPPORTED_ROLE_MESSAGE =
-  'This app supports driver and inspection accounts only. Please sign in with one of those.';
+  'This app supports driver, inspection and operations accounts only. Please sign in with one of those.';
 
 interface AuthState {
   status: 'loading' | 'signedIn' | 'signedOut';

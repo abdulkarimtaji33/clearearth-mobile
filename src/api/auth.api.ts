@@ -8,7 +8,11 @@ export async function login(email: string, password: string): Promise<LoginRespo
 
 export async function getCurrentUser(): Promise<CurrentUserResponse> {
   const res = await apiClient.get<ApiEnvelope<CurrentUserResponse>>('/auth/me');
-  return res.data.data;
+  const data = res.data.data as unknown as Omit<CurrentUserResponse, 'role'> & { role: string | { name: string } };
+  // /auth/me returns role as an object ({ id, name, displayName }) while /auth/login returns the
+  // role name string. Normalize so the rest of the app can rely on `role: string`.
+  const role = typeof data.role === 'object' && data.role ? data.role.name : (data.role as string);
+  return { ...data, role } as CurrentUserResponse;
 }
 
 export async function logout(): Promise<void> {
