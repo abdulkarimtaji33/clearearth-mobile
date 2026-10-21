@@ -5,8 +5,12 @@ import { Ionicons } from '@expo/vector-icons';
 
 interface DateTimeFieldProps {
   label: string;
-  value: Date;
+  value: Date | null;
   onChange: (date: Date) => void;
+  /** Text shown when `value` is null. */
+  placeholder?: string;
+  /** Shows a clear button while a value is set. */
+  onClear?: () => void;
   mode?: 'date' | 'time';
   maximumDate?: Date;
   disabled?: boolean;
@@ -20,7 +24,8 @@ interface DateTimeFieldProps {
  * iOS shows a spinner inside a bottom sheet with Cancel/Done so a stray tap
  * can't silently commit a half-scrolled value.
  */
-export function DateTimeField({ label, value, onChange, mode = 'date', maximumDate, disabled, error }: DateTimeFieldProps) {
+export function DateTimeField({ label, value: valueProp, onChange, placeholder = 'Not set', onClear, mode = 'date', maximumDate, disabled, error }: DateTimeFieldProps) {
+  const value = valueProp ?? new Date();
   const [iosPickerOpen, setIosPickerOpen] = useState(false);
   const [draft, setDraft] = useState(value);
 
@@ -42,8 +47,9 @@ export function DateTimeField({ label, value, onChange, mode = 'date', maximumDa
     }
   }
 
-  const formatted =
-    mode === 'time'
+  const formatted = !valueProp
+    ? placeholder
+    : mode === 'time'
       ? value.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
       : value.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 
@@ -57,8 +63,15 @@ export function DateTimeField({ label, value, onChange, mode = 'date', maximumDa
           error ? 'border-danger-500' : 'border-neutral-200 dark:border-neutral-700'
         } ${disabled ? 'opacity-50' : ''}`}
       >
-        <Text className="text-base text-neutral-900 dark:text-neutral-50">{formatted}</Text>
-        <Ionicons name={mode === 'time' ? 'time-outline' : 'calendar-outline'} size={18} color="#94A3B8" />
+        <Text className={`text-base ${valueProp ? 'text-neutral-900 dark:text-neutral-50' : 'text-neutral-400'}`}>{formatted}</Text>
+        <View className="flex-row items-center" style={{ gap: 10 }}>
+          {valueProp && onClear && !disabled ? (
+            <Pressable onPress={onClear} hitSlop={10} accessibilityLabel={`Clear ${label}`}>
+              <Ionicons name="close-circle" size={18} color="#94A3B8" />
+            </Pressable>
+          ) : null}
+          <Ionicons name={mode === 'time' ? 'time-outline' : 'calendar-outline'} size={18} color="#94A3B8" />
+        </View>
       </Pressable>
       {error ? <Text className="text-xs text-danger-500 mt-1.5">{error}</Text> : null}
 

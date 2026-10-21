@@ -8,6 +8,7 @@ export interface GrnListParams {
   pageSize?: number;
   search?: string;
   status?: GrnStatus;
+  workOrderId?: number;
 }
 
 export async function fetchGrns(params: GrnListParams): Promise<PaginatedEnvelope<Grn>> {

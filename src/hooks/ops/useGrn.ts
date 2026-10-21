@@ -9,6 +9,15 @@ export function useGrns(params: Omit<api.GrnListParams, 'page'>) {
   return usePaginated(opsKeys.grnList(params), (page) => api.fetchGrns({ ...params, page, pageSize: 20 }));
 }
 
+/** The GRN (if any) generated for a work order. */
+export function useGrnForWorkOrder(workOrderId: number, enabled: boolean) {
+  return useQuery({
+    queryKey: [...opsKeys.grns, 'forWorkOrder', workOrderId],
+    queryFn: async () => (await api.fetchGrns({ workOrderId, pageSize: 1 })).data[0] ?? null,
+    enabled,
+  });
+}
+
 export function useGrn(id: number) {
   return useQuery({ queryKey: opsKeys.grn(id), queryFn: () => api.fetchGrn(id), enabled: Number.isFinite(id) });
 }
