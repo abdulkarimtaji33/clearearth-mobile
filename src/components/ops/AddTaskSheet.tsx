@@ -8,19 +8,23 @@ import { Input } from '@/components/ui/Input';
 import { WorkTypePickerSheet } from '@/components/ops/WorkTypePickerSheet';
 import { AssigneeSheet } from '@/components/ops/AssigneeSheet';
 import { useAssignees } from '@/hooks/ops/useLookups';
-import { toDateOnly } from '@/lib/format';
+import { parseDateOnly, toDateOnly } from '@/lib/format';
 import { fullName } from '@/lib/opsFormat';
 import type { TaskInput } from '@/api/ops/types';
 
 interface AddTaskSheetProps {
   visible: boolean;
   saving?: boolean;
+  /** Prefill for editing a draft task. */
+  initial?: TaskInput | null;
+  title?: string;
+  submitLabel?: string;
   onClose: () => void;
   onSubmit: (input: TaskInput) => void;
 }
 
 /** Quick "add a task" form: work type, optional dates, optional assignees, optional note. */
-export function AddTaskSheet({ visible, saving = false, onClose, onSubmit }: AddTaskSheetProps) {
+export function AddTaskSheet({ visible, saving = false, initial = null, title = 'Add task', submitLabel = 'Add task', onClose, onSubmit }: AddTaskSheetProps) {
   const { data: people } = useAssignees();
   const [workType, setWorkType] = useState<{ id: number; name: string } | null>(null);
   const [start, setStart] = useState<Date | null>(null);
@@ -32,14 +36,16 @@ export function AddTaskSheet({ visible, saving = false, onClose, onSubmit }: Add
 
   useEffect(() => {
     if (visible) {
-      setWorkType(null);
-      setStart(null);
-      setEnd(null);
-      setAssigneeIds([]);
-      setNotes('');
+      setWorkType(initial?.workTypeId ? { id: initial.workTypeId, name: initial.typeOfWork ?? '' } : null);
+      setStart(parseDateOnly(initial?.startDate));
+      setEnd(parseDateOnly(initial?.endDate));
+      setAssigneeIds(initial?.assigneeIds ?? []);
+      setNotes(initial?.notes ?? '');
       setOverlay(null);
       setError(null);
     }
+    // Seed only when the sheet opens.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   const assigneeNames = (people ?? []).filter((p) => assigneeIds.includes(p.id)).map(fullName).join(', ');
@@ -50,6 +56,7 @@ export function AddTaskSheet({ visible, saving = false, onClose, onSubmit }: Add
       return;
     }
     onSubmit({
+      ...(initial?.id ? { id: initial.id } : {}),
       workTypeId: workType.id,
       typeOfWork: workType.name,
       startDate: start ? toDateOnly(start) : null,
@@ -65,8 +72,8 @@ export function AddTaskSheet({ visible, saving = false, onClose, onSubmit }: Add
       <BottomSheet
         visible={visible && overlay === null}
         onClose={onClose}
-        title="Add task"
-        footer={<Button label="Add task" loading={saving} onPress={submit} fullWidth size="lg" />}
+        title={title}
+        footer={<Button label={submitLabel} loading={saving} onPress={submit} fullWidth size="lg" />}
       >
         <View style={{ gap: 14 }}>
           <View>

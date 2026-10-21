@@ -4,7 +4,8 @@
  */
 import assert from 'node:assert/strict';
 import { appendTask, removeTask, replaceTask, taskToInput } from '../src/lib/taskSerializer.ts';
-import type { WorkOrderTask } from '../src/api/ops/types';
+import { appendGrnItem, grnItemToInput, removeGrnItem, replaceGrnItem } from '../src/lib/grnSerializer.ts';
+import type { GrnItem, WorkOrderTask } from '../src/api/ops/types';
 
 const task = (over: Partial<WorkOrderTask>): WorkOrderTask => ({
   id: 1,
@@ -56,4 +57,19 @@ assert.deepEqual(removeTask(tasks, 1).map((t) => t.id), [2]);
 const appended = appendTask(tasks, { typeOfWork: 'Delivery' });
 assert.deepEqual(appended.map((t) => t.id), [1, 2, undefined]);
 
-console.log('task serializer: all assertions passed');
+// 5. GRN items keep their photos when another item is edited
+const grnItem = (id: number, name: string): GrnItem => ({
+  id, grn_id: 1, item_name: name, material_type_id: 2, quantity: '10.00', unit_of_measure: 'kg',
+  make: null, model: null, serial_number: null, units: null, notes: null,
+  images: [{ id: id * 10, grn_item_id: id, image_url: `/uploads/${name}.jpg`, original_name: `${name}.jpg` }],
+});
+const items = [grnItem(1, 'a'), grnItem(2, 'b')];
+const edited = replaceGrnItem(items, 2, { itemName: 'b2', quantity: 5 });
+assert.equal(edited[0]!.images![0]!.imageUrl, '/uploads/a.jpg');
+assert.equal(edited[1]!.itemName, 'b2');
+assert.equal(edited[1]!.images![0]!.imageUrl, '/uploads/b.jpg'); // carried over when the edit omits images
+assert.equal(grnItemToInput(items[0]!).materialTypeId, 2);
+assert.equal(removeGrnItem(items, 1).length, 1);
+assert.equal(appendGrnItem(items, { itemName: 'c', quantity: 1 }).length, 3);
+
+console.log('serializers: all assertions passed');
