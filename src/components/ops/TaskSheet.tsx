@@ -183,7 +183,7 @@ export function TaskSheet({ visible, onClose, workOrderId, tasks, task, locked }
         </View>
         {locked ? (
           <Text className="text-xs text-neutral-500 text-center mt-4">
-            This work order is {`completed or cancelled`}, so tasks are read-only.
+            Tasks are read-only because this work order is completed or cancelled.
           </Text>
         ) : null}
       </BottomSheet>

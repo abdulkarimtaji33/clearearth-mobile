@@ -1,6 +1,6 @@
 # ClearEarth Mobile: Operations App Plan
 
-**Status:** Planned · **Date:** 2026-10-22 · **Target:** `clearearth-mobile` (Expo SDK 57, RN 0.86, NativeWind 4, React Query 5)
+**Status:** Built (all phases) · **Date:** 2026-10-22 · **Target:** `clearearth-mobile` (Expo SDK 57, RN 0.86, NativeWind 4, React Query 5)
 
 ## Decisions
 
@@ -244,3 +244,14 @@ Each phase ends with a self-review: type check, a run of the affected flows, and
 - **Push notifications** need an EAS project (`extra.eas.projectId`) and Android FCM credentials, which this repo doesn't have yet. The code paths are built and no-op safely until these are added. In-app realtime via Socket.IO works without them.
 - **Certificates** for operations depend on an admin granting `certificates.read/create` to the role.
 - **Money:** the app never shows deal or order amounts to operations, which matches the web's redaction.
+
+
+## Build outcome (2026-10-22)
+
+All eight phases were implemented. Deviations from the plan above:
+
+- **Progress ring** was replaced by a progress bar plus an "N of M tasks done" label (no `react-native-svg` dependency).
+- **Full database migration** was run on the local dev DB after a backup, because it was missing tables the code already depended on (not only the new `user_push_tokens`).
+- **Release build** uses `gradlew.bat assembleRelease` with the Android SDK at `E:\Android\Sdk` (installed because none existed), arm64 only, single worker, ~1 GB heap. The default multi-ABI build exhausts memory on this machine.
+- The release APK is signed with the project's debug keystore. Create a real keystore before any store release.
+- **Not verified on a device or emulator.** Verification done: `tsc --noEmit`, Metro bundling (all modules resolve), serializer tests, and 24 backend API smoke checks.
