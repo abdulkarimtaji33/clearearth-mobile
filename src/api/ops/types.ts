@@ -502,11 +502,10 @@ export interface CertificateRequestRow {
 
 export interface CertificateRow {
   id: number;
-  certificate_number?: string | null;
-  type?: string | null;
-  status?: string | null;
-  issue_date?: string | null;
-  company_name?: string | null;
+  certificate_number: string;
+  type: string | null;
+  issued_date: string | null;
+  request?: { id: number; company_name: string | null; grn_no: string | null } | null;
 }
 
 export type LeaveStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
@@ -516,8 +515,8 @@ export interface LeaveRequestRow {
   status: LeaveStatus;
   start_date: string;
   end_date: string;
-  days?: number | string | null;
+  days_count?: number | string | null;
   reason: string | null;
-  employee?: { id: number; first_name: string; last_name: string } | null;
+  employee?: { id: number; first_name: string; last_name: string; employee_code?: string | null } | null;
   leaveType?: { id: number; name: string } | null;
 }

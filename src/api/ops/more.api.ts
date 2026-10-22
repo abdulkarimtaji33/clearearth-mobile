@@ -38,15 +38,15 @@ export async function updateCollectionDetails(id: number, payload: CollectionDet
   await apiClient.patch(`/deals/${id}/collection-details`, payload);
 }
 
-export interface LocationShareToken {
-  token: string;
-  url?: string;
-  expiresAt?: string;
+export interface LocationShareLink {
+  shareUrl: string;
+  expiresAt: string;
 }
 
-export async function createLocationShareToken(dealId: number): Promise<LocationShareToken> {
-  const res = await apiClient.post<ApiEnvelope<LocationShareToken>>(`/location-share/deals/${dealId}/token`);
-  return res.data.data;
+/** Unlike most endpoints this one returns { shareUrl, expiresAt } at the top level (no `data`). */
+export async function createLocationShareToken(dealId: number): Promise<LocationShareLink> {
+  const res = await apiClient.post<{ success: boolean } & LocationShareLink>(`/location-share/deals/${dealId}/token`);
+  return { shareUrl: res.data.shareUrl, expiresAt: res.data.expiresAt };
 }
 
 /* ------------------------------- Certificates ------------------------------- */
