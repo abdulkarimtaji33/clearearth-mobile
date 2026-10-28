@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -106,7 +107,7 @@ export function PickupDetailScreen() {
         <Badge label={PRIORITY_CONFIG[pickup.priority].label} tone={pickup.priority} />
       </View>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 32, gap: 16 }}>
+      <KeyboardAwareScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 32, gap: 16 }}>
         <Animated.View entering={FadeInDown.duration(300)}>
           <Card>
             <StatusStepper steps={STEPS} activeIndex={STEP_INDEX[pickup.taskStatus] ?? 0} />
@@ -183,7 +184,7 @@ export function PickupDetailScreen() {
             <PhotoGallery title="Pickup Photos" icon="camera-outline" files={pickup.files} />
           </Animated.View>
         ) : null}
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 }

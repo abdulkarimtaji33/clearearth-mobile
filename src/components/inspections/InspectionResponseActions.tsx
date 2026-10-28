@@ -8,13 +8,16 @@ import { useToast } from '@/components/ui/Toast';
 
 interface InspectionResponseActionsProps {
   requestId: number;
+  /** False once the request is already accepted: only Reject is offered (web parity —
+   * the web app and API allow rejecting any request that isn't already rejected). */
+  canAccept?: boolean;
 }
 
-/** Shown while response_status === 'pending'. Reject opens an inline reason
+/** Shown while response_status === 'pending' (Accept + Reject) or 'accepted' (Reject only). Reject opens an inline reason
  * field (required by the backend) instead of a native-only Alert.prompt, so
  * it behaves the same on iOS and Android. Both accept and reject require a
  * final native confirmation before the mutation actually fires. */
-export function InspectionResponseActions({ requestId }: InspectionResponseActionsProps) {
+export function InspectionResponseActions({ requestId, canAccept = true }: InspectionResponseActionsProps) {
   const toast = useToast();
   const acceptMutation = useAcceptInspection(requestId);
   const rejectMutation = useRejectInspection(requestId);
@@ -62,7 +65,9 @@ export function InspectionResponseActions({ requestId }: InspectionResponseActio
     <Card>
       <View className="flex-row items-center gap-1.5 mb-3">
         <Ionicons name="help-circle-outline" size={17} color="#0F172A" />
-        <Text className="text-base font-bold text-neutral-900 dark:text-neutral-50">Respond to this request</Text>
+        <Text className="text-base font-bold text-neutral-900 dark:text-neutral-50">
+          {canAccept ? 'Respond to this request' : "Can't carry this out?"}
+        </Text>
       </View>
 
       {rejecting ? (
@@ -103,9 +108,11 @@ export function InspectionResponseActions({ requestId }: InspectionResponseActio
               disabled={busy}
             />
           </View>
-          <View className="flex-1">
-            <Button label="Accept" onPress={handleAccept} loading={acceptMutation.isPending} disabled={busy} />
-          </View>
+          {canAccept ? (
+            <View className="flex-1">
+              <Button label="Accept" onPress={handleAccept} loading={acceptMutation.isPending} disabled={busy} />
+            </View>
+          ) : null}
         </View>
       )}
     </Card>

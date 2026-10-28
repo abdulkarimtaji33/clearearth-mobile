@@ -1,5 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -61,6 +62,8 @@ export function InspectionDetailScreen() {
   const supportingDocuments = parseSupportingDocuments(request.supporting_documents);
   const report = request.deal?.inspectionReport;
   const canRespond = request.response_status === 'pending';
+  // An accepted request can still be rejected (same rule as the web app and the API).
+  const canRejectAccepted = request.response_status === 'accepted';
 
   return (
     <View className="flex-1 bg-neutral-50 dark:bg-neutral-950">
@@ -89,7 +92,7 @@ export function InspectionDetailScreen() {
         />
       </View>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 32, gap: 16 }}>
+      <KeyboardAwareScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 32, gap: 16 }}>
         <Animated.View entering={FadeInDown.duration(300)}>
           <Card>
             <StatusStepper steps={INSPECTION_STATUS_STEPS} activeIndex={STEP_INDEX[request.status] ?? 0} />
@@ -112,6 +115,12 @@ export function InspectionDetailScreen() {
         ) : hasInspectionProgressAction(request) ? (
           <Animated.View entering={FadeInDown.duration(300).delay(60)}>
             <InspectionProgressAction request={request} />
+          </Animated.View>
+        ) : null}
+
+        {canRejectAccepted ? (
+          <Animated.View entering={FadeInDown.duration(300).delay(80)}>
+            <InspectionResponseActions requestId={request.id} canAccept={false} />
           </Animated.View>
         ) : null}
 
@@ -157,7 +166,7 @@ export function InspectionDetailScreen() {
             />
           </Animated.View>
         ) : null}
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 }

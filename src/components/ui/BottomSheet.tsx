@@ -1,25 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Keyboard, Modal, Platform, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import React from 'react';
+import { Modal, Pressable, Text, View, useWindowDimensions } from 'react-native';
 import Animated, { SlideInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-
-function useKeyboardHeight() {
-  const [height, setHeight] = useState(0);
-  useEffect(() => {
-    const show = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow', (e) =>
-      setHeight(e.endCoordinates.height)
-    );
-    const hide = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', () =>
-      setHeight(0)
-    );
-    return () => {
-      show.remove();
-      hide.remove();
-    };
-  }, []);
-  return height;
-}
+import { KeyboardAwareScrollView, useKeyboardHeight } from '@/components/ui/KeyboardAwareScrollView';
 
 interface BottomSheetProps {
   visible: boolean;
@@ -92,7 +76,9 @@ export function BottomSheet({
                 </Pressable>
               </View>
             ) : null}
-            <ScrollView
+            <KeyboardAwareScrollView
+              inset={false}
+              clearance={footer ? 120 : 24}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{
@@ -103,7 +89,7 @@ export function BottomSheet({
               style={tall ? { flex: 1 } : { flexGrow: 0 }}
             >
               {children}
-            </ScrollView>
+            </KeyboardAwareScrollView>
             {footer ? (
               <View
                 className="px-5 pt-3 border-t border-neutral-100 dark:border-neutral-800"

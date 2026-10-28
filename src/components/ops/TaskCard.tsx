@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { StatusPill } from '@/components/ui/StatusPill';
 import { AvatarStack } from '@/components/ui/AvatarStack';
 import { TASK_STATUS, TONE_HEX, nextTaskStatus } from '@/constants/opsStatus';
-import { dateRangeLabel, dueInfo } from '@/lib/opsFormat';
+import { collectedSummary, dateRangeLabel, dueInfo } from '@/lib/opsFormat';
 import { haptic } from '@/lib/haptics';
 import type { TaskStatus, WorkOrderTask } from '@/api/ops/types';
 
@@ -23,6 +23,7 @@ export const TaskCard = React.memo(function TaskCard({ task, index, readOnly, on
   const fileCount = task.files?.length ?? 0;
   const expenseCount = task.expenses?.length ?? 0;
   const range = dateRangeLabel(task.start_date, task.end_date);
+  const collected = collectedSummary(task);
 
   return (
     <Pressable
@@ -69,6 +70,15 @@ export const TaskCard = React.memo(function TaskCard({ task, index, readOnly, on
           }
         />
       </View>
+
+      {collected ? (
+        <View className="flex-row items-center mt-3 px-3 py-2 rounded-xl bg-primary-50 dark:bg-primary-900/30" style={{ gap: 8 }}>
+          <Ionicons name="cube" size={15} color="#059669" />
+          <Text className="flex-1 text-[13px] font-bold text-primary-800 dark:text-primary-200" numberOfLines={1}>
+            Collected: {collected}
+          </Text>
+        </View>
+      ) : null}
 
       <View className="flex-row items-center justify-between mt-3">
         {people.length ? (

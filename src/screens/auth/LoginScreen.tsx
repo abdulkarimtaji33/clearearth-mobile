@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -54,7 +55,8 @@ export function LoginScreen() {
       className="flex-1"
     >
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1">
-        <ScrollView
+        <KeyboardAwareScrollView
+        inset={Platform.OS !== 'ios'}
           style={{ flex: 1 }}
           contentContainerStyle={{ flexGrow: 1, paddingTop: insets.top }}
           keyboardShouldPersistTaps="handled"
@@ -168,7 +170,7 @@ export function LoginScreen() {
               <View className="mb-8" />
             )}
           </Animated.View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </KeyboardAvoidingView>
 
       {__DEV__ ? <ApiUrlSheet visible={settingsOpen} onClose={() => setSettingsOpen(false)} /> : null}

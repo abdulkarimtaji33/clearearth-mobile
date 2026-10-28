@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
@@ -74,7 +75,7 @@ export function ProfileScreen() {
         <Text className="text-lg font-bold text-neutral-900 dark:text-neutral-50">Profile</Text>
       </View>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 32, gap: 16 }}>
+      <KeyboardAwareScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 32, gap: 16 }}>
         <Card>
           <View className="items-center py-2">
             <Avatar name={fullName} size={72} />
@@ -168,7 +169,7 @@ export function ProfileScreen() {
         <Text className="text-xs text-neutral-400 dark:text-neutral-600 text-center mt-2">
           ClearEarth v{Constants.expoConfig?.version ?? '1.0.0'}
         </Text>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 }

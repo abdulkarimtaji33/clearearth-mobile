@@ -1,5 +1,5 @@
 import { formatShortDate, todayDateOnly } from '@/lib/format';
-import type { OrderRow, PurchaseOrderRow } from '@/api/ops/types';
+import type { OrderRow, PurchaseOrderRow, WorkOrderTask } from '@/api/ops/types';
 
 const DAY_MS = 86_400_000;
 
@@ -74,4 +74,11 @@ export function relativeTime(iso?: string | null): string {
   const d = Math.round(hr / 24);
   if (d < 7) return `${d}d ago`;
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+/** "120 kg · Good" from the details a driver enters when marking a pickup collected; null if none. */
+export function collectedSummary(task: Pick<WorkOrderTask, 'pickup_quantity' | 'pickup_uom' | 'pickup_condition'>): string | null {
+  const hasQty = task.pickup_quantity !== null && task.pickup_quantity !== undefined && task.pickup_quantity !== '';
+  const parts = [hasQty ? formatQty(task.pickup_quantity, task.pickup_uom) : null, task.pickup_condition || null].filter(Boolean);
+  return parts.length ? parts.join(' · ') : null;
 }

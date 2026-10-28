@@ -61,6 +61,10 @@ export interface WorkOrderTask {
   status: TaskStatus;
   notes: string | null;
   sort_order: number;
+  /** Filled in by the driver app when a pickup is marked collected. */
+  pickup_quantity?: string | number | null;
+  pickup_uom?: string | null;
+  pickup_condition?: string | null;
   assignedUser?: UserLite | null;
   assignees?: UserLite[];
   files?: TaskFile[];

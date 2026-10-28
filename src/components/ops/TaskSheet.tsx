@@ -16,6 +16,7 @@ import { WorkTypePickerSheet } from '@/components/ops/WorkTypePickerSheet';
 import { useEditTasks, useSetTaskAssignees, useSetTaskNotes, useSetTaskStatus } from '@/hooks/ops/useWorkOrders';
 import { TASK_STATUS, TASK_STATUS_ORDER } from '@/constants/opsStatus';
 import { parseDateOnly, toDateOnly } from '@/lib/format';
+import { formatQty } from '@/lib/opsFormat';
 import { toUserMessage } from '@/lib/errors';
 import { haptic } from '@/lib/haptics';
 import type { TaskStatus, WorkOrderTask } from '@/api/ops/types';
@@ -104,6 +105,31 @@ export function TaskSheet({ visible, onClose, workOrderId, tasks, task, locked }
             value={task.status}
             onChange={changeStatus}
           />
+
+          {task.pickup_quantity != null && task.pickup_quantity !== '' || task.pickup_condition ? (
+            <View className="p-4 rounded-2xl bg-primary-50 dark:bg-primary-900/30 border border-primary-100 dark:border-primary-800">
+              <View className="flex-row items-center mb-2" style={{ gap: 6 }}>
+                <Ionicons name="cube" size={17} color="#059669" />
+                <Text className="text-base font-extrabold text-primary-800 dark:text-primary-200">Collected by driver</Text>
+              </View>
+              <View className="flex-row" style={{ gap: 24 }}>
+                {task.pickup_quantity != null && task.pickup_quantity !== '' ? (
+                  <View>
+                    <Text className="text-xs text-neutral-500">Quantity</Text>
+                    <Text className="text-lg font-extrabold text-neutral-900 dark:text-neutral-50">
+                      {formatQty(task.pickup_quantity, task.pickup_uom)}
+                    </Text>
+                  </View>
+                ) : null}
+                {task.pickup_condition ? (
+                  <View className="flex-1">
+                    <Text className="text-xs text-neutral-500">Condition</Text>
+                    <Text className="text-lg font-extrabold text-neutral-900 dark:text-neutral-50">{task.pickup_condition}</Text>
+                  </View>
+                ) : null}
+              </View>
+            </View>
+          ) : null}
 
           <View>
             <Text className="text-base font-extrabold text-neutral-900 dark:text-neutral-50 mb-2.5">Assigned to</Text>

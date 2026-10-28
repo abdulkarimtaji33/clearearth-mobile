@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -134,7 +135,8 @@ export function CreateWorkOrderScreen() {
       <ScreenHeader title="New work order" subtitle={number} back />
       <StepIndicator steps={STEPS} current={step} />
 
-      <ScrollView
+      <KeyboardAwareScrollView
+        inset={Platform.OS !== 'ios'}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: 20, paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
@@ -264,7 +266,7 @@ export function CreateWorkOrderScreen() {
             </Card>
           </View>
         ) : null}
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <View
         className="flex-row px-5 pt-3 bg-white dark:bg-neutral-900 border-t border-neutral-100 dark:border-neutral-800"

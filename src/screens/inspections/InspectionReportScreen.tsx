@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -138,7 +139,7 @@ export function InspectionReportScreen() {
         <Text className="text-lg font-bold text-neutral-900 dark:text-neutral-50">Inspection report</Text>
       </View>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 32, gap: 16 }}>
+      <KeyboardAwareScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 32, gap: 16 }}>
         <Card>
           <Text className="text-base font-bold text-neutral-900 dark:text-neutral-50 mb-3">Inspection date &amp; time</Text>
           <View className="flex-row gap-3">
@@ -270,7 +271,7 @@ export function InspectionReportScreen() {
           fullWidth
           size="lg"
         />
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 }
