@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import ImageViewing from 'react-native-image-viewing';
@@ -6,7 +6,8 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useApproveGrn, useGrn, useUpdateGrn, useUploadGrnItemImages } from '@/hooks/ops/useGrn';
+import { useApproveGrn, useGrn, useStorageFacilities, useUpdateGrn, useUploadGrnItemImages } from '@/hooks/ops/useGrn';
+import { Input } from '@/components/ui/Input';
 import { usePermission } from '@/hooks/usePermission';
 import { useRefreshOnFocus } from '@/hooks/ops/useRefreshOnFocus';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
@@ -52,6 +53,18 @@ export function GrnDetailScreen() {
   const [viewer, setViewer] = useState<{ uris: string[]; index: number } | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [uploadingItem, setUploadingItem] = useState<number | null>(null);
+  const { data: facilities = [] } = useStorageFacilities();
+  const [facilityId, setFacilityId] = useState<number | null>(null);
+  const [disposedWithout, setDisposedWithout] = useState(false);
+  const [driverComment, setDriverComment] = useState('');
+  useEffect(() => {
+    if (!grn) return;
+    setFacilityId(grn.storage_facility_id ?? null);
+    setDisposedWithout(Boolean(grn.disposed_without_facility));
+    setDriverComment(grn.driver_comment ?? '');
+  }, [grn?.id, grn?.storage_facility_id, grn?.disposed_without_facility, grn?.driver_comment]);
+  const facilityMissing = !disposedWithout && !facilityId;
+  const commentMissing = disposedWithout && !driverComment.trim();
 
   const items = grn?.items ?? [];
   const locked = !grn || grn.status === 'approved' || !canEdit;
@@ -147,11 +160,9 @@ export function GrnDetailScreen() {
               </View>
               <InfoRow icon="business-outline" label="Client" value={grn.deal?.company?.company_name} />
               <InfoRow
-                icon="person-outline"
-                label="Contact"
-                value={grn.deal?.contact ? `${fullName(grn.deal.contact)}${grn.deal.contact.phone ? ` · ${grn.deal.contact.phone}` : ''}` : null}
-                onPress={grn.deal?.contact?.phone ? () => callPhoneNumber(grn.deal!.contact!.phone!) : undefined}
-                actionIcon="call-outline"
+                icon="cube-outline"
+                label="Storage facility"
+                value={grn.disposed_without_facility ? 'Disposed without coming to the facility' : grn.storageFacility?.name ?? null}
               />
               <InfoRow
                 icon="construct-outline"
@@ -160,6 +171,7 @@ export function GrnDetailScreen() {
                 onPress={grn.work_order_id ? () => navigation.navigate('WorkOrderDetail', { id: grn.work_order_id! }) : undefined}
               />
               <InfoRow icon="time-outline" label="Created" value={formatDateTime(grn.created_at)} />
+              {grn.driver_comment ? <InfoRow icon="chatbubble-outline" label="Driver comment" value={grn.driver_comment} /> : null}
               {grn.status === 'approved' ? (
                 <InfoRow icon="shield-checkmark-outline" label="Approved by" value={`${fullName(grn.approvedByUser)} · ${formatDateTime(grn.approved_at) ?? ''}`} />
               ) : null}
@@ -271,9 +283,42 @@ export function GrnDetailScreen() {
         loading={update.isPending}
         onCancel={() => setConfirm(null)}
         onConfirm={async () => {
-          if (await run(() => update.mutateAsync({ status: 'submitted' }), 'GRN submitted. Sales has been notified.')) setConfirm(null);
+          if (facilityMissing) { toast.show('Select the storage facility first, or mark it as disposed without coming to the facility.', 'error'); return; }
+          if (commentMissing) { toast.show('Add a driver comment explaining why it did not come to the facility.', 'error'); return; }
+          const payload = { status: 'submitted' as const, storageFacilityId: disposedWithout ? null : facilityId, disposedWithoutFacility: disposedWithout, driverComment: driverComment.trim() || null };
+          if (await run(() => update.mutateAsync(payload), 'GRN submitted. Sales has been notified.')) setConfirm(null);
         }}
-      />
+      >
+        <View style={{ gap: 10 }}>
+          <Text className="text-sm font-bold text-neutral-800 dark:text-neutral-100">Where is it stored?</Text>
+          <View className="flex-row flex-wrap" style={{ gap: 8 }}>
+            {facilities.map((f) => {
+              const on = !disposedWithout && facilityId === f.id;
+              return (
+                <Pressable
+                  key={f.id}
+                  onPress={() => { setDisposedWithout(false); setFacilityId(f.id); }}
+                  accessibilityRole="button"
+                  className={`px-4 py-2.5 rounded-full border ${on ? 'bg-primary-600 border-primary-600' : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700'}`}
+                >
+                  <Text className={`text-sm font-bold ${on ? 'text-white' : 'text-neutral-700 dark:text-neutral-200'}`}>{f.name}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+          <Pressable onPress={() => setDisposedWithout((v) => !v)} accessibilityRole="checkbox" className="flex-row items-center" style={{ gap: 8 }}>
+            <Ionicons name={disposedWithout ? 'checkbox' : 'square-outline'} size={22} color="#059669" />
+            <Text className="text-sm text-neutral-800 dark:text-neutral-100">Disposed without coming to the facility</Text>
+          </Pressable>
+          <Input
+            label={disposedWithout ? 'Driver comment (required)' : 'Driver comment (optional)'}
+            value={driverComment}
+            onChangeText={setDriverComment}
+            placeholder="Why it did not come to the facility, or anything else to note"
+            multiline
+          />
+        </View>
+      </ConfirmSheet>
 
       <ConfirmSheet
         visible={confirm === 'approve'}

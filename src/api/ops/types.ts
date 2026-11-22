@@ -294,6 +294,10 @@ export interface Grn {
   deal_id: number | null;
   status: GrnStatus;
   notes: string | null;
+  storage_facility_id?: number | null;
+  storageFacility?: { id: number; name: string } | null;
+  driver_comment?: string | null;
+  disposed_without_facility?: boolean;
   created_at: string;
   approved_at: string | null;
   workOrder?: { id: number; title: string | null; status: WorkOrderStatus } | null;
@@ -307,6 +311,11 @@ export interface Grn {
   createdByUser?: UserLite | null;
   approvedByUser?: UserLite | null;
   items?: GrnItem[];
+}
+
+export interface StorageFacility {
+  id: number;
+  name: string;
 }
 
 export interface GrnItemInput {

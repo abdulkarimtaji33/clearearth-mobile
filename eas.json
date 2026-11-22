@@ -8,7 +8,7 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://72.60.223.25:3333/api/v1"
+        "EXPO_PUBLIC_API_URL": "http://72.60.222.81:3335/api/v1"
       }
     },
     "preview": {
@@ -16,7 +16,7 @@
       "channel": "preview",
       "android": { "buildType": "apk" },
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://72.60.223.25:3333/api/v1"
+        "EXPO_PUBLIC_API_URL": "http://72.60.222.81:3335/api/v1"
       }
     },
     "production": {

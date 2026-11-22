@@ -1,7 +1,7 @@
 import { apiClient } from '@/api/client';
 import type { ApiEnvelope, PaginatedEnvelope } from '@/api/types';
 import { buildFileForm, multipartConfig, type UploadFile } from '@/lib/upload';
-import type { Grn, GrnItemInput, GrnStatus, InventoryItemRow, StockRow } from './types';
+import type { Grn, GrnItemInput, GrnStatus, InventoryItemRow, StockRow, StorageFacility } from './types';
 
 export interface GrnListParams {
   page?: number;
@@ -29,6 +29,9 @@ export async function createGrn(workOrderId: number, items: GrnItemInput[] = [])
 export interface UpdateGrnPayload {
   notes?: string | null;
   status?: GrnStatus;
+  storageFacilityId?: number | null;
+  disposedWithoutFacility?: boolean;
+  driverComment?: string | null;
   /** Full replace: omit to leave items untouched. Carry existing images so they survive. */
   items?: GrnItemInput[];
 }
@@ -72,5 +75,10 @@ export async function fetchInventoryItems(params: InventoryListParams): Promise<
 
 export async function fetchStockOnHand(): Promise<StockRow[]> {
   const res = await apiClient.get<ApiEnvelope<StockRow[]>>('/grn/inventory/stock');
+  return res.data.data;
+}
+
+export async function fetchStorageFacilities(): Promise<StorageFacility[]> {
+  const res = await apiClient.get<ApiEnvelope<StorageFacility[]>>('/grn/facilities');
   return res.data.data;
 }

@@ -78,3 +78,7 @@ export function useCreateGrn() {
     onSettled: () => invalidate(),
   });
 }
+
+export function useStorageFacilities() {
+  return useQuery({ queryKey: [...opsKeys.grns, 'facilities'], queryFn: api.fetchStorageFacilities, staleTime: 5 * 60_000 });
+}
