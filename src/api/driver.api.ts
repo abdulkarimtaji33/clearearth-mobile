@@ -33,6 +33,7 @@ export async function completePickup(
   if (payload.uom) form.append('uom', payload.uom);
   if (payload.condition) form.append('condition', payload.condition);
   if (payload.remarks) form.append('remarks', payload.remarks);
+  if (payload.pickupNote) form.append('pickupNote', JSON.stringify(payload.pickupNote));
   (payload.photos ?? []).forEach((photo) => {
     // React Native FormData file shape: { uri, name, type }
     form.append('photos', photo as unknown as Blob);

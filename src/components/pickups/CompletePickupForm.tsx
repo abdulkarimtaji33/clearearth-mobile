@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { PhotoPicker, type PickedPhoto } from './PhotoPicker';
 import { useUomOptions } from '@/hooks/useDropdown';
-import type { CompletePickupPayload } from '@/api/types';
+import { PickupNoteSection, emptyPickupNote } from './PickupNoteSection';
+import type { CompletePickupPayload, PickupNoteDetails } from '@/api/types';
 
 const CONDITIONS = ['Good', 'Fair', 'Poor', 'Damaged'] as const;
 const REMARKS_MAX = 250;
@@ -15,6 +16,7 @@ interface CompletePickupFormProps {
   initialUom?: string | null;
   initialCondition?: string | null;
   initialRemarks?: string | null;
+  initialNote?: PickupNoteDetails | null;
   submitting: boolean;
   uploadProgress?: number | null;
   onSubmit: (payload: CompletePickupPayload) => void;
@@ -25,6 +27,7 @@ export function CompletePickupForm({
   initialUom,
   initialCondition,
   initialRemarks,
+  initialNote,
   submitting,
   uploadProgress,
   onSubmit,
@@ -35,6 +38,7 @@ export function CompletePickupForm({
   const [condition, setCondition] = useState(initialCondition ?? '');
   const [remarks, setRemarks] = useState(initialRemarks ?? '');
   const [photos, setPhotos] = useState<PickedPhoto[]>([]);
+  const [note, setNote] = useState<PickupNoteDetails>({ ...emptyPickupNote(), ...(initialNote ?? {}) });
 
   function handleSubmit() {
     onSubmit({
@@ -42,6 +46,7 @@ export function CompletePickupForm({
       uom: uom.trim() || undefined,
       condition: condition.trim() || undefined,
       remarks: remarks.trim() || undefined,
+      pickupNote: note,
       photos,
     });
   }
@@ -118,6 +123,8 @@ export function CompletePickupForm({
           })}
         </View>
       </Card>
+
+      <PickupNoteSection value={note} onChange={setNote} disabled={submitting} />
 
       <PhotoPicker photos={photos} onChange={setPhotos} disabled={submitting} />
 

@@ -91,6 +91,7 @@ export interface PickupDetail extends Omit<PickupListItem, 'deal'> {
   uom: string | null;
   pickupUom: string | null;
   pickupQuantity: string | null;
+  pickupNote?: PickupNoteDetails | null;
   pickupCondition: string | null;
   assignedUser: { id: number; name: string } | null;
   files: PickupTaskFile[];
@@ -109,7 +110,32 @@ export interface CompletePickupResponse {
   status: 'completed';
 }
 
+export interface PickupNoteItem {
+  description: string;
+  unit: string;
+  weightKg: string;
+}
+
+export interface PickupNoteDetails {
+  noteNumber: string;
+  pickupDate: string;
+  vehicleNo: string;
+  referenceNo: string;
+  pickupType: string;
+  serviceType: string;
+  serviceOffered: string;
+  customerName: string;
+  customerAddress: string;
+  contactPerson: string;
+  contactNo: string;
+  email: string;
+  specialRequest: string;
+  freeNote: string;
+  items: PickupNoteItem[];
+}
+
 export interface CompletePickupPayload {
+  pickupNote?: PickupNoteDetails;
   quantity?: string;
   uom?: string;
   condition?: string;

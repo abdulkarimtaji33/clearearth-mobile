@@ -156,6 +156,7 @@ export function PickupDetailScreen() {
               initialUom={pickup.pickupUom ?? pickup.uom}
               initialCondition={pickup.pickupCondition}
               initialRemarks={pickup.notes}
+              initialNote={pickup.pickupNote}
               submitting={completeMutation.isPending}
               uploadProgress={uploadProgress}
               onSubmit={handleComplete}
