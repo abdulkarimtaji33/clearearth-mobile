@@ -5,6 +5,7 @@ import { initApiBaseUrl } from '@/lib/env';
 import { tokenStorage } from '@/lib/secureStore';
 import { isSupportedRole } from '@/lib/roles';
 import type { AuthTenant, AuthUser } from '@/api/types';
+import { setBaseCurrency } from '@/lib/currency';
 
 const UNSUPPORTED_ROLE_MESSAGE =
   'This app supports driver, inspection and operations accounts only. Please sign in with one of those.';
@@ -31,6 +32,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     tenant: null,
     error: null,
   });
+
+  useEffect(() => {
+    setBaseCurrency(state.tenant?.baseCurrency);
+  }, [state.tenant]);
 
   const signOut = useCallback(async () => {
     try {

@@ -15,6 +15,7 @@ import { toUserMessage } from '@/lib/errors';
 import { haptic } from '@/lib/haptics';
 import type { TaskExpense } from '@/api/ops/types';
 import type { StatusMeta } from '@/constants/opsStatus';
+import { getBaseCurrency } from '@/lib/currency';
 
 interface ExpensesSectionProps {
   workOrderId: number;
@@ -36,7 +37,7 @@ const toInput = (e: TaskExpense): ExpenseInput => ({
 });
 
 const money = (v: number | string) =>
-  `AED ${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  `${getBaseCurrency()} ${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 /** A line is locked once accounts has posted it to the ledger. */
 const isLocked = (e: TaskExpense) => !!e.ledgerExpense || e.accounts_status === 'approved';
@@ -189,7 +190,7 @@ export function ExpensesSection({ workOrderId, taskId, expenses }: ExpensesSecti
       >
         <View style={{ gap: 14 }}>
           <Input
-            label="Amount (AED)"
+            label={`Amount (${getBaseCurrency()})`}
             value={amount}
             onChangeText={(t) => {
               setAmount(t.replace(/[^0-9.]/g, ''));

@@ -20,6 +20,7 @@ export interface AuthUser {
 }
 
 export interface AuthTenant {
+  baseCurrency?: string;
   id: number;
   name: string;
   companyName: string;
